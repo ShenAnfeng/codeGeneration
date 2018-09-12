@@ -1,0 +1,169 @@
+<#include "/macro.include"/>
+<#assign className = table.className>
+<#assign tableName = table.sqlName>
+<#assign classNameFirstLower = table.classNameFirstLower>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${className}Mapper">
+	<resultMap id="BaseResultMap" type="${className}">
+		<#list table.columns as column>
+		<#if column.columnNameFirstLower=="id">
+		<id column="ID" jdbcType="${column.jdbcType}" property="id" />
+		<#else>
+		<result column="${column.sqlName}" jdbcType="${column.jdbcType}" property="${column.columnNameFirstLower}" />
+		</#if>
+		</#list>
+	</resultMap>
+	<sql id="Example_Where_Clause">
+		<where>
+			<trim prefix="(" prefixOverrides="and" suffix=")">
+				<#list table.columns as column>
+				<#if !column.isQueryReserve && column.jdbcType=="VARCHAR">
+				<if test="${column.columnNameFirstLower} != null">
+					and ${column.sqlName} = ${"#{"}${column.columnNameFirstLower},jdbcType=${column.jdbcType}${"}"}
+				</if>
+				<#elseif !column.isQueryReserve>
+				<if test="${column.columnNameFirstLower} != null and ${column.columnNameFirstLower} != ''">
+					and ${column.sqlName} = ${"#{"}${column.columnNameFirstLower},jdbcType=${column.jdbcType}${"}"}
+				</if>
+				</#if>
+				</#list>
+			</trim>
+		</where>
+	</sql>
+	<sql id="Example_Set_Clause">
+		<set>
+			<trim suffixOverrides=",">
+				<#list table.columns as column>
+				<#if !column.isQueryReserve>
+				<if test="${column.columnNameFirstLower} != null">
+					${column.sqlName} = ${"#{"}${column.columnNameFirstLower},jdbcType=${column.jdbcType}${"},"}
+				</if>
+				<#elseif column.columnNameFirstLower=="updateTime">
+				UPDATE_TIME = NOW(),
+				</#if>
+				</#list>
+			</trim>
+		</set>
+	</sql>
+	<sql id="Base_Column_List">
+		<#list table.columns as column>
+		<#if column_index=(table.columns?size-1)>
+		${column.sqlName}
+		<#else>
+		${column.sqlName},
+		</#if>
+		</#list>
+	</sql>
+	<sql id="Base_Set_Clause">
+		<set>
+			<trim suffixOverrides=",">
+				<#list table.columns as column>
+				<#if !column.isQueryReserve>
+				${column.sqlName} = ${"#{"}${column.columnNameFirstLower},jdbcType=${column.jdbcType}${"}"},
+				</#if>
+				</#list>
+			</trim>
+		</set>
+	</sql>
+	<sql id="Selective_Column_List">
+		<#list table.columns as column>
+		<#if !column.isQueryReserve>
+		<if test="${column.columnNameFirstLower} != null">
+			${column.sqlName},
+		</if>
+		<#elseif column.columnNameFirstLower=="id">
+		ID,
+		<#elseif column.columnNameFirstLower=="createTime">
+		CREATE_TIME,
+		</#if>
+		</#list>
+	</sql>
+	<sql id="Base_Value_List">
+		<#list table.columns as column>
+		${"#{"}${column.columnNameFirstLower},jdbcType=${column.jdbcType}${"},"}
+		</#list>
+	</sql>
+	<sql id="Selective_Value_List">
+		<#list table.columns as column>
+		<#if !column.isQueryReserve>
+		<if test="${column.columnNameFirstLower} != null">
+			${"#{"}${column.columnNameFirstLower},jdbcType=${column.jdbcType}${"},"}
+		</if>
+		<#elseif column.columnNameFirstLower=="id">
+		${"#{"}${column.columnNameFirstLower}${"},"}
+		<#elseif column.columnNameFirstLower=="createTime">
+		NOW(),
+		</#if>
+		</#list>
+	</sql>
+
+	<select id="selectByExample" parameterType="${className}Query" resultMap="BaseResultMap">
+		select
+		<trim suffixOverrides=",">
+			<include refid="Base_Column_List" />
+		</trim>
+		from ${tableName}
+		<include refid="Example_Where_Clause" />
+		<!-- order by CREATE_DATE -->
+	</select>
+	<select id="selectByPrimaryKey" parameterType="Integer" resultMap="BaseResultMap">
+		select
+		<trim suffixOverrides=",">
+			<include refid="Base_Column_List" />
+		</trim>
+		from ${tableName}
+		where ID = ${"#{"}id,jdbcType=SMALLINT${"}"}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="Integer">
+		delete from ${tableName}
+		where ID = ${"#{"}id,jdbcType=SMALLINT${"}"}
+	</delete>
+	<delete id="deleteByExample" parameterType="${className}Query">
+		delete from ${tableName}
+		<include refid="Example_Where_Clause" />
+	</delete>
+	<insert id="insert" parameterType="${className}">
+		insert into ${tableName}
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<include refid="Base_Column_List" />
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<include refid="Base_Value_List" />
+		</trim>
+	</insert>
+	<insert id="insertSelective" parameterType="${className}" useGeneratedKeys="true" keyProperty="id">
+		insert into ${tableName}
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<include refid="Selective_Column_List" />
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<include refid="Selective_Value_List" />
+		</trim>
+	</insert>
+	<select id="countByExample" parameterType="${className}Query" resultType="java.lang.Integer">
+		select count(*) from ${tableName}
+		<include refid="Example_Where_Clause" />
+	</select>
+	<update id="updateByPrimaryKeySelective" parameterType="${className}">
+		update ${tableName}
+		<include refid="Example_Set_Clause" />
+		where ID = ${"#{"}id,jdbcType=SMALLINT${"}"}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="${className}">
+		update ${tableName}
+		<include refid="Base_Set_Clause" />
+		where ID = ${"#{"}id,jdbcType=SMALLINT${"}"}
+	</update>
+
+	<select id="selectPageByExample" parameterType="${className}Query" resultMap="BaseResultMap">
+		select
+		<trim suffixOverrides=",">
+			<include refid="Base_Column_List" />
+		</trim>
+		from ${tableName}
+		<include refid="Example_Where_Clause" />
+        <![CDATA[ limit ${"#{"}startRow${"}"},${"#{"}endRow${"}"} ]]>
+  		<!-- order by CREATE_DATE -->
+	</select>
+</mapper>

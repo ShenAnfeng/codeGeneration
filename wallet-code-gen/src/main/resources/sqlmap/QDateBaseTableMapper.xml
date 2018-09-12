@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="QDateBaseTableMapper" >
+	<select id="queryAllTables" resultType="GenTable" parameterType="java.util.Map">
+		<include refid="Page_Query_Begin" />
+		SELECT
+			tb.TABLE_NAME as name,
+			c.COMMENTS as comments
+		FROM
+			user_tables tb,
+			user_tab_comments c
+		where 1 = 1
+			and tb.TABLE_NAME = c.TABLE_NAME
+		<!-- <if test="tableName !=null and tableName!= ''">
+			and TABLE_NAME like CONCAT('%',#{tableName},'%')
+		</if> -->
+		<if test="tableName !=null and tableName!= ''">
+			and tb.TABLE_NAME like #{tableName}
+		</if>
+		<include refid="Page_Query_End" />
+	</select>
+	
+	<select id="queryCount" resultType="long" parameterType="java.util.Map">
+		SELECT
+			COUNT(tb.TABLE_NAME)
+		FROM
+			user_tables tb,
+			user_tab_comments c
+		WHERE
+			1 = 1
+			and tb.TABLE_NAME = c.TABLE_NAME 
+		<!-- <if test="tableName !=null and tableName!= ''">
+			<![CDATA[and m.TABLE_NAME like CONCAT('%',#{tableName},'%')]]>
+		</if> -->
+		<if test="tableName !=null and tableName!= ''">
+			and tb.TABLE_NAME like #{tableName}
+		</if>
+	</select>
+	
+	<sql id="Page_Query_Begin">
+		select * from(select t.*,rownum rn from(
+	</sql>
+	
+	<sql id="Page_Query_End">
+		) t where rownum &lt;= ${endRow}) where rn &gt; ${startRow}
+	</sql>
+</mapper>

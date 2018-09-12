@@ -1,0 +1,26 @@
+<#assign className = table.className>
+<#assign classNameLower = className?uncap_first>
+说明： 以下内容帮助你在生成各个组件后配置工程
+
+<!--在 action-servlet.xml中增加一个bean -->
+<bean name="/${classNameLower}" class="net.crpsWebOper.project.struts.action.table.Action${className}" />
+
+<!-- 在struts-config.xml的action中增加一个action描述 -->
+<action path="/${classNameLower}"
+		parameter="method"
+		scope="request"
+	    input="/需要加上路径/${classNameLower}List.jsp"
+	    validate="false" 
+		type="org.springframework.web.struts.DelegatingActionProxy">
+	<forward name="${classNameLower}List" path="/需要加上路径/${classNameLower}List.jsp" />
+    <forward name="${classNameLower}Add" path="/需要加上路径/${classNameLower}Add.jsp" />
+    <forward name="${classNameLower}Update" path="/需要加上路径/${classNameLower}Update.jsp" />										
+    <forward name="${classNameLower}View" path="/需要加上路径/${classNameLower}View.jsp" />										
+</action>
+
+<!-- 在serviceContext.xml文件中增加以下内容 -->
+<bean id="service${className}Impl" class="net.crpsWebOper.product.service.impl.Service${className}Impl"/>
+    
+<!-- 在daoContext.xml 文件中增加以下内容 -->
+<bean id="${classNameLower}Dao" class="net.crpsWebOper.product.dao.${className}Dao" />
+

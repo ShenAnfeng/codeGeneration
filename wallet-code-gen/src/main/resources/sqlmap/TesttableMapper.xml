@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TesttableMapper">
+	<resultMap id="BaseResultMap" type="Testtable">
+		<id column="ID" jdbcType="VARCHAR" property="id" />
+		<result column="NAME" jdbcType="VARCHAR" property="name" />
+		<result column="length" jdbcType="INTEGER" property="length" />
+		<result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+	</resultMap>
+	<sql id="Example_Where_Clause">
+		<where>
+			<trim prefix="(" prefixOverrides="and" suffix=")">
+				<if test="name != null">
+					and NAME = #{name,jdbcType=VARCHAR}
+				</if>
+				<if test="length != null and length != ''">
+					and length = #{length,jdbcType=INTEGER}
+				</if>
+			</trim>
+		</where>
+	</sql>
+	<sql id="Example_Set_Clause">
+		<set>
+			<trim suffixOverrides=",">
+				<if test="name != null">
+					NAME = #{name,jdbcType=VARCHAR},
+				</if>
+				<if test="length != null">
+					length = #{length,jdbcType=INTEGER},
+				</if>
+			</trim>
+		</set>
+	</sql>
+	<sql id="Base_Column_List">
+		ID,
+		NAME,
+		length,
+		CREATE_TIME
+	</sql>
+	<sql id="Base_Set_Clause">
+		<set>
+			<trim suffixOverrides=",">
+				NAME = #{name,jdbcType=VARCHAR},
+				length = #{length,jdbcType=INTEGER},
+			</trim>
+		</set>
+	</sql>
+	<sql id="Selective_Column_List">
+		ID,
+		<if test="name != null">
+			NAME,
+		</if>
+		<if test="length != null">
+			length,
+		</if>
+		CREATE_TIME,
+	</sql>
+	<sql id="Base_Value_List">
+		#{id,jdbcType=VARCHAR},
+		#{name,jdbcType=VARCHAR},
+		#{length,jdbcType=INTEGER},
+		#{createTime,jdbcType=TIMESTAMP},
+	</sql>
+	<sql id="Selective_Value_List">
+		#{id},
+		<if test="name != null">
+			#{name,jdbcType=VARCHAR},
+		</if>
+		<if test="length != null">
+			#{length,jdbcType=INTEGER},
+		</if>
+		NOW(),
+	</sql>
+
+	<select id="selectByExample" parameterType="TesttableQuery" resultMap="BaseResultMap">
+		select
+		<trim suffixOverrides=",">
+			<include refid="Base_Column_List" />
+		</trim>
+		from TESTTABLE
+		<include refid="Example_Where_Clause" />
+		<!-- order by CREATE_DATE -->
+	</select>
+	<select id="selectByPrimaryKey" parameterType="String" resultMap="BaseResultMap">
+		select
+		<trim suffixOverrides=",">
+			<include refid="Base_Column_List" />
+		</trim>
+		from TESTTABLE
+		where ID = #{id,jdbcType=VARCHAR}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="String">
+		delete from TESTTABLE
+		where ID = #{id,jdbcType=VARCHAR}
+	</delete>
+	<delete id="deleteByExample" parameterType="TesttableQuery">
+		delete from TESTTABLE
+		<include refid="Example_Where_Clause" />
+	</delete>
+	<insert id="insert" parameterType="Testtable">
+		insert into TESTTABLE
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<include refid="Base_Column_List" />
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<include refid="Base_Value_List" />
+		</trim>
+	</insert>
+	<insert id="insertSelective" parameterType="Testtable">
+		<selectKey keyProperty="id" resultType="String" order="BEFORE">
+			select nextval('PUBID')
+		</selectKey>
+		insert into TESTTABLE
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<include refid="Selective_Column_List" />
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<include refid="Selective_Value_List" />
+		</trim>
+	</insert>
+	<select id="countByExample" parameterType="TesttableQuery" resultType="java.lang.Integer">
+		select count(*) from TESTTABLE
+		<include refid="Example_Where_Clause" />
+	</select>
+	<update id="updateByPrimaryKeySelective" parameterType="Testtable">
+		update TESTTABLE
+		<include refid="Example_Set_Clause" />
+		where ID = #{id,jdbcType=VARCHAR}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="Testtable">
+		update TESTTABLE
+		<include refid="Base_Set_Clause" />
+		where ID = #{id,jdbcType=VARCHAR}
+	</update>
+
+	<select id="selectPageByExample" parameterType="TesttableQuery" resultMap="BaseResultMap">
+		select
+		<trim suffixOverrides=",">
+			<include refid="Base_Column_List" />
+		</trim>
+		from TESTTABLE
+		<include refid="Example_Where_Clause" />
+        <![CDATA[ limit #{startRow},#{endRow} ]]>
+  		<!-- order by CREATE_DATE -->
+	</select>
+</mapper>
